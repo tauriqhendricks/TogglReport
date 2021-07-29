@@ -1,4 +1,16 @@
 /* You can add global styles to this file, and also import other style files */
 
 /* Bootstrap */
- @import 'bootstrap';
+@import "bootstrap";
+
+/* Custom */
+@import "variables";
+@import "mixins";
+@import "custom";
+
+/*
+  To use your variables in other components, you’ll have to import them into every component-name.component.scss file like so.
+  But because we imported all of Bootstrap’s .scss files into our angular.json file, we can leave off the path which makes things much cleaner:
+  component-name.component.scss 
+  @import 'variables';
+*/
