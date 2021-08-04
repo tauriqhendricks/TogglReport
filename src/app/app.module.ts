@@ -5,6 +5,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppRoutingModule } from './app-routing.module';
 import { ComponentsModule } from './components/components.module';
 import { SharedModule } from './shared/shared.module';
+import { ChartsModule } from 'ng2-charts';
 
 import { AppComponent } from './app.component';
 
@@ -18,6 +19,7 @@ import { AppComponent } from './app.component';
     HttpClientModule,
     ComponentsModule,
     SharedModule,
+    ChartsModule
   ],
   providers: [],
   bootstrap: [AppComponent]

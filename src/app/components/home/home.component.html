@@ -1,7 +1,7 @@
 <p>HOME</p>
 
-<form (ngSubmit)="submit()" novalidate>
-  <div class="mt-3 mb-3">
+<form (ngSubmit)="submitThisWeek()" novalidate>
+  <!-- <div class="mt-3 mb-3">
     <h3>Please Enter</h3>
   </div>
 
@@ -13,7 +13,30 @@
   <div class="mb-3">
     <label for="WorkspaceId" class="form-label">Workspace ID</label>
     <input type="text" class="form-control" id="WorkspaceId" name="WorkspaceId" [(ngModel)]="workspaceId">
-  </div>
+  </div> -->
 
-  <button type="submit" class="btn btn-primary">Submit</button>
+  <button type="button" class="btn btn-primary me-3" (click)="test()">Test</button>
+  <button type="submit" class="btn btn-primary me-3">This Week</button>
+  <button type="button" class="btn btn-primary me-3" (click)="submitLastWeek()">Last Week</button>
+  <button type="button" class="btn btn-primary me-3" (click)="submitThisMonth()">This Month</button>
+  <button type="button" class="btn btn-primary me-3" (click)="submitLastMonth()">Last Month</button>
 </form>
+
+<!-- <div style="display: block;">
+  <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions"
+    [plugins]="barChartPlugins" [legend]="barChartLegend" [chartType]="barChartType">
+  </canvas>
+</div> -->
+
+<div style="display: block;" *ngIf="!isLoading && barChartDataMonth && barChartDataMonth.length > 0 ">
+  <canvas baseChart [datasets]="barChartDataMonth" [labels]="barChartLabelsMonth" [options]="barChartOptions"
+    [plugins]="barChartPlugins" [legend]="barChartLegend" [chartType]="barChartType">
+  </canvas>
+</div>
+
+<div *ngIf="!isLoading && users && users.length > 0">
+  <h5>Total Hours:</h5>
+  <div *ngFor="let user of users">
+    <h6>{{user.user}}: {{user.totalHours}}</h6>
+  </div>
+</div>

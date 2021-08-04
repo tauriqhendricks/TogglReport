@@ -1,30 +1,32 @@
 import { Money } from "./money.model";
 
-export class Report {
+export class ReportWeekly {
 
   total_grand: number;
   total_billable: string;
   total_currencies: Money[] = [];
-  data: ReportData[] = [];
+  data: ReportDataWeekly[] = [];
   week_totals: string[] = [];
 
   groupBy: string;
+  since: string;
+  until: string;
 
 }
 
-class ReportData{
+class ReportDataWeekly{
   
   pid?: string;
   uid?: string;
 
-  title: DataTitle;
+  title: DataTitleWeekly;
   totals: string[] = [];
 
-  details: DataDetails[] = []
+  details: DataDetailsWeekly[] = []
   
 }
 
-class DataTitle{
+class DataTitleWeekly{
 
   user?: string;
   client?: string;
@@ -32,12 +34,12 @@ class DataTitle{
 
 }
 
-class DataDetails{
+class DataDetailsWeekly{
 
   pid?: string;
   uid?: string;
 
-  title: DataTitle;
+  title: DataTitleWeekly;
   totals: string[] = [];
 
 }
