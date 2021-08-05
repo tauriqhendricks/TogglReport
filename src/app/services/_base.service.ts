@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
-import { catchError, tap } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { Observable, throwError } from 'rxjs';
 import { HttpOptions } from '../shared/models/http-options.model';
 
@@ -20,10 +20,11 @@ export class BaseService {
       `${this.actionUrl}/${url}`,
       httpOptions
     ).pipe(catchError(this.handleError));
-// .pipe(tap(),
+
   }
 
   public handleError(err: any) {
+
     if (err.status === 500) {
       return throwError(err);
     }
@@ -33,6 +34,7 @@ export class BaseService {
     }
 
     return throwError(err);
+    
   }
 
 }

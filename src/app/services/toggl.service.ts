@@ -1,9 +1,10 @@
 import { HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { HttpOptions } from '../shared/models/http-options.model';
 import { ReportMonthly } from '../shared/models/report-monthly.model';
 import { ReportWeekly as ReportWeekly } from '../shared/models/report-weekly.model';
+import { Workspace } from '../shared/models/workspace-model';
 import { BaseService } from './_base.service';
 
 @Injectable({
@@ -11,9 +12,7 @@ import { BaseService } from './_base.service';
 })
 export class TogglService extends BaseService {
 
-  // https://github.com/tauriqhendricks/TogglReport.git
   private password: string = 'api_token';
-  // apiWorkspaces: 'https://api.track.toggl.com/api/v8/workspaces',
   private action: string = 'reports/api/v2';
 
   public getWeeklyReport(apiKey: string, workspaceId: string, groupBy: string, since: string, until: string): Observable<ReportWeekly> {
@@ -30,9 +29,6 @@ export class TogglService extends BaseService {
         .set('since', since)
         .set('until', until)
     };
-    console.log('httpOptions headers', httpOptions.headers);
-    console.log('httpOptions params', httpOptions.params);
-    console.log('this.action', this.action);
 
     return this.baseGet(`${this.action}/weekly`, httpOptions);
 
@@ -53,12 +49,15 @@ export class TogglService extends BaseService {
         .set('until', until)
         .set('page', page)
     };
-    console.log('httpOptions headers', httpOptions.headers);
-    console.log('httpOptions params', httpOptions.params);
-    console.log('this.action', this.action);
 
     return this.baseGet(`${this.action}/details`, httpOptions);
 
+  }
+
+  private workspaceSource = new BehaviorSubject<Workspace>(new Workspace());
+  workspaceChange$ = this.workspaceSource.asObservable();
+  changeWorkspace(workspace: Workspace) {
+    this.workspaceSource.next(workspace);
   }
 
 }

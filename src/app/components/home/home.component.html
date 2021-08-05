@@ -1,42 +1,75 @@
-<p>HOME</p>
+<div class="mt-4">
 
-<form (ngSubmit)="submitThisWeek()" novalidate>
-  <!-- <div class="mt-3 mb-3">
-    <h3>Please Enter</h3>
+  <form (ngSubmit)="submitThisWeek()" novalidate>
+
+    <div *ngIf="warningMessage && warningMessage.length > 0" class="alert alert-custom" role="alert">
+      {{warningMessage}}
+    </div>
+    <div *ngIf="errorMessage && errorMessage.length > 0" class="alert alert-danger" role="alert">
+      {{errorMessage}}
+    </div>
+
+    <div>
+      <div class="me-3 mb-1" style="font-weight: 500; font-size: 19px;">
+        Get Times Logged For
+      </div>
+
+      <button type="submit" class="btn bg-btn btn-sm me-3" style="font-weight: 500;">
+        This Week
+      </button>
+
+      <button type="button" class="btn bg-btn btn-sm me-3" style="font-weight: 500;" (click)="submitLastWeek()">
+        Last Week
+      </button>
+
+      <button type="button" class="btn bg-btn btn-sm me-3" style="font-weight: 500;" (click)="submitThisMonth()">
+        This Month
+      </button>
+
+      <button type="button" class="btn bg-btn btn-sm me-3" style="font-weight: 500;" (click)="submitLastMonth()">
+        Last Month
+      </button>
+    </div>
+  </form>
+
+  <div *ngIf="!isLoading && chartSettings.chartData && chartSettings.chartData.length === 0"
+   style="display: block;" class="mt-4 mb-4">
+    <canvas baseChart
+      [datasets]="chartSettings.chartDataDefault"
+      [labels]="chartSettings.chartLabelsDefault"
+      [options]="chartSettings.chartOptions"
+      [plugins]="chartSettings.chartPlugins"
+      [legend]="chartSettings.chartLegend"
+      [chartType]="chartSettings.chartType"
+      [colors]="chartSettings.chartColors">
+    </canvas>
   </div>
 
-  <div class="mt-3 mb-3">
-    <label for="ApiKey" class="form-label">API Key</label>
-    <input type="text" class="form-control" id="ApiKey" name="ApiKey" [(ngModel)]="apiKey">
+  <div *ngIf="!isLoading && chartSettings.chartData && chartSettings.chartData.length > 0" 
+    style="display: block;" class="mt-4 mb-4">
+    <canvas baseChart
+      [datasets]="chartSettings.chartData"
+      [labels]="chartSettings.chartLabels"
+      [options]="chartSettings.chartOptions"
+      [plugins]="chartSettings.chartPlugins"
+      [legend]="chartSettings.chartLegend"
+      [chartType]="chartSettings.chartType"
+      [colors]="chartSettings.chartColors">
+    </canvas>
   </div>
 
-  <div class="mb-3">
-    <label for="WorkspaceId" class="form-label">Workspace ID</label>
-    <input type="text" class="form-control" id="WorkspaceId" name="WorkspaceId" [(ngModel)]="workspaceId">
-  </div> -->
-
-  <button type="button" class="btn btn-primary me-3" (click)="test()">Test</button>
-  <button type="submit" class="btn btn-primary me-3">This Week</button>
-  <button type="button" class="btn btn-primary me-3" (click)="submitLastWeek()">Last Week</button>
-  <button type="button" class="btn btn-primary me-3" (click)="submitThisMonth()">This Month</button>
-  <button type="button" class="btn btn-primary me-3" (click)="submitLastMonth()">Last Month</button>
-</form>
-
-<!-- <div style="display: block;">
-  <canvas baseChart [datasets]="barChartData" [labels]="barChartLabels" [options]="barChartOptions"
-    [plugins]="barChartPlugins" [legend]="barChartLegend" [chartType]="barChartType">
-  </canvas>
-</div> -->
-
-<div style="display: block;" *ngIf="!isLoading && barChartDataMonth && barChartDataMonth.length > 0 ">
-  <canvas baseChart [datasets]="barChartDataMonth" [labels]="barChartLabelsMonth" [options]="barChartOptions"
-    [plugins]="barChartPlugins" [legend]="barChartLegend" [chartType]="barChartType">
-  </canvas>
-</div>
-
-<div *ngIf="!isLoading && users && users.length > 0">
-  <h5>Total Hours:</h5>
-  <div *ngFor="let user of users">
-    <h6>{{user.user}}: {{user.totalHours}}</h6>
+  <div *ngIf="!isLoading && users && users.length > 0" class="d-flex">
+    <div *ngFor="let user of users; let i = index" class="card me-1">
+      <div class="card-body" [ngClass]="'bg' + (i+1)">
+        <h6 class="card-subtitle mb-3">{{user.user}}</h6>
+        <p class="card-text">
+          <span style="font-weight: 500;">Total Hours:</span>
+          <span style="font-weight: 500; color: #414141;">&nbsp;{{user.totalHours}}</span>
+        </p>
+      </div>
+    </div>
   </div>
+
+  <app-is-loading [isLoading]="isLoading"></app-is-loading>
+
 </div>

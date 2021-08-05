@@ -1,5 +1,3 @@
-import { TimeUnits } from "../models/time-units.model";
-
 export function convertMillisToTimeString(value: any): string {
 
   const delim = ':';
@@ -14,24 +12,6 @@ export function convertMillisToTimeString(value: any): string {
   const secs = seconds < 10 ? '0' + seconds : seconds;
 
   return hrs + 'h' + delim + mins + 'm' + delim + secs + 's';
-
-}
-
-export function convertMillisToTimeUnits(value: any): TimeUnits {
-
-  const hours = Math.floor(value / (1000 * 60 * 60) % 60);
-  const minutes = Math.floor(value / (1000 * 60) % 60);
-  const seconds = Math.floor(value / 1000 % 60);
-
-  const hrs = hours < 10 ? '0' + hours : hours;
-  const mins = minutes < 10 ? '0' + minutes : minutes;
-  const secs = seconds < 10 ? '0' + seconds : seconds;
-
-  return {
-    hours: hrs.toString(),
-    minutes: mins.toString(),
-    seconds: secs.toString(),
-  };
 
 }
 
@@ -100,8 +80,8 @@ export function compareDate(date1: Date, date2: Date): number {
   if (d1 > d2) return 1;
 
   // Check if the first is less than second
-  if (d1 < d2) return -1;
+  else if (d1 < d2) return -1;
 
-  return 12;
+  return 0;
 
 }
