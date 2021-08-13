@@ -1,3 +1,5 @@
+import { TimePeriod } from "../models/time-period.model";
+
 export function convertMillisToTimeString(value: any): string {
 
   const delim = ':';
@@ -12,6 +14,21 @@ export function convertMillisToTimeString(value: any): string {
   const secs = seconds < 10 ? '0' + seconds : seconds;
 
   return hrs + 'h' + delim + mins + 'm' + delim + secs + 's';
+
+}
+
+export function convertTimeStringToTimePeriod(value: string): TimePeriod {
+
+  const split = value.split(/[:hms]/);
+  const hours = split[0];
+  const minutes = split[2];
+  const senconds = split[4];
+
+  return {
+    hours: hours,
+    minutes: minutes,
+    seconds: senconds
+  }
 
 }
 

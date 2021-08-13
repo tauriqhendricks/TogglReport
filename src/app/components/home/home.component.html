@@ -1,4 +1,4 @@
-<div class="mt-4">
+<div class="mt-4 mb-4">
 
   <form (ngSubmit)="submitThisWeek()" novalidate>
 
@@ -10,65 +10,156 @@
     </div>
 
     <div>
-      <div class="me-3 mb-1" style="font-weight: 500; font-size: 19px;">
+      <div class="me-3 mb-1 fw-500 fs-19">
         Get Times Logged For
       </div>
 
-      <button type="submit" class="btn bg-btn btn-sm me-3" style="font-weight: 500;">
+      <button type="submit" class="btn bg-btn btn-sm me-3 fw-500">
         This Week
       </button>
 
-      <button type="button" class="btn bg-btn btn-sm me-3" style="font-weight: 500;" (click)="submitLastWeek()">
+      <button type="button" class="btn bg-btn btn-sm me-3 fw-500" (click)="submitLastWeek()">
         Last Week
       </button>
 
-      <button type="button" class="btn bg-btn btn-sm me-3" style="font-weight: 500;" (click)="submitThisMonth()">
+      <button type="button" class="btn bg-btn btn-sm me-3 fw-500" (click)="submitThisMonth()">
         This Month
       </button>
 
-      <button type="button" class="btn bg-btn btn-sm me-3" style="font-weight: 500;" (click)="submitLastMonth()">
+      <button type="button" class="btn bg-btn btn-sm me-3 fw-500" (click)="submitLastMonth()">
         Last Month
       </button>
     </div>
   </form>
 
-  <div *ngIf="!isLoading && chartSettings.chartData && chartSettings.chartData.length === 0"
-   style="display: block;" class="mt-4 mb-4">
-    <canvas baseChart
-      [datasets]="chartSettings.chartDataDefault"
-      [labels]="chartSettings.chartLabelsDefault"
-      [options]="chartSettings.chartOptions"
-      [plugins]="chartSettings.chartPlugins"
-      [legend]="chartSettings.chartLegend"
-      [chartType]="chartSettings.chartType"
-      [colors]="chartSettings.chartColors">
+  <div *ngIf="!isLoading && chartSettings.chartData && chartSettings.chartData.length === 0" class="mt-4 mb-4 d-block">
+    <canvas baseChart [datasets]="chartSettings.chartDataDefault" [labels]="chartSettings.chartLabelsDefault"
+      [options]="chartSettings.chartOptions" [plugins]="chartSettings.chartPlugins" [legend]="chartSettings.chartLegend"
+      [chartType]="chartSettings.chartType" [colors]="chartSettings.chartColors">
     </canvas>
   </div>
 
-  <div *ngIf="!isLoading && chartSettings.chartData && chartSettings.chartData.length > 0" 
-    style="display: block;" class="mt-4 mb-4">
-    <canvas baseChart
-      [datasets]="chartSettings.chartData"
-      [labels]="chartSettings.chartLabels"
-      [options]="chartSettings.chartOptions"
-      [plugins]="chartSettings.chartPlugins"
-      [legend]="chartSettings.chartLegend"
-      [chartType]="chartSettings.chartType"
-      [colors]="chartSettings.chartColors">
+  <div *ngIf="!isLoading && chartSettings.chartData && chartSettings.chartData.length > 0" class="mt-4 mb-4 d-block">
+    <canvas baseChart [datasets]="chartSettings.chartData" [labels]="chartSettings.chartLabels"
+      [options]="chartSettings.chartOptions" [plugins]="chartSettings.chartPlugins" [legend]="chartSettings.chartLegend"
+      [chartType]="chartSettings.chartType" [colors]="chartSettings.chartColors">
     </canvas>
   </div>
 
-  <div *ngIf="!isLoading && users && users.length > 0" class="d-flex">
-    <div *ngFor="let user of users; let i = index" class="card me-1">
-      <div class="card-body" [ngClass]="'bg' + (i+1)">
-        <h6 class="card-subtitle mb-3">{{user.user}}</h6>
-        <p class="card-text">
-          <span style="font-weight: 500;">Total Hours:</span>
-          <span style="font-weight: 500; color: #414141;">&nbsp;{{user.totalHours}}</span>
-        </p>
+  <ng-container *ngIf="period.includes('Week')">
+    <div *ngIf="!isLoading && users && users.length > 0" class="d-flex">
+      <div *ngFor="let user of users; let i = index" class="card me-1" [ngClass]="'border' + (i+1)">
+        <div class="card-header fw-500 d-flex justify-content-between" [ngClass]="'bg' + (i+1)">
+          <span>{{user.user}}</span>
+
+          <ng-container *ngIf="period === 'This Week'">
+            <span *ngIf="amountOfDaysNotLoggedFor6Hours(user.user) > 0" class="badge bg-danger">
+              {{amountOfDaysNotLoggedFor6Hours(user.user)}}
+            </span>
+          </ng-container>
+        </div>
+        <div class="card-body">
+          <p class="card-title grid-2">
+            <span class="me-1 fw-500">Total Hours:</span>
+            <span class="fw-500 std-text">{{user.totalHours}}</span>
+          </p>
+
+          <ng-container *ngIf="showDetails">
+            <div class="card-text grid-2">
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[0])}">Monday:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[0]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[0].duration}}
+              </span>
+
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[1])}">Tuesday:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[1]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[1].duration}}
+              </span>
+
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[2])}">Wednesday:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[2]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[2].duration}}
+              </span>
+
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[3])}">Thursday:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[3]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[3].duration}}
+              </span>
+
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[4])}">Friday:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[4]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[4].duration}}
+              </span>
+
+              <span>Saturday:</span>
+              <span class="std-text">{{user.daysLogged[5].duration}}</span>
+
+              <span>Sunday:</span>
+              <span class="std-text">{{user.daysLogged[6].duration}}</span>
+            </div>
+          </ng-container>
+        </div>
       </div>
+
+      <button type="button" class="btn bg-btn ms-auto fw-500 h-40" (click)="showDetails = !showDetails">More
+        Details</button>
     </div>
-  </div>
+  </ng-container>
+
+  <ng-container *ngIf="period.includes('Month')">
+    <div *ngIf="!isLoading && users && users.length > 0" class="d-flex">
+      <div *ngFor="let user of users; let i = index" class="card me-1" [ngClass]="'border' + (i+1)">
+        <div class="card-header fw-500 d-flex justify-content-between" [ngClass]="'bg' + (i+1)">
+          {{user.user}}
+        </div>
+        <div class="card-body">
+          <p class="card-title grid-2">
+            <span class="me-1 fw-500">Total Hours:</span>
+            <span class="fw-500 std-text">{{user.totalHours}}</span>
+          </p>
+
+          <!-- <ng-container *ngIf="showDetails">
+            <div class="card-text grid-2">
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[0])}">Week 1:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[0]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[0].duration}}
+              </span>
+
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[1])}">Week 2:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[1]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[1].duration}}
+              </span>
+
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[2])}">Week 3:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[2]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[2].duration}}
+              </span>
+
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[3])}">Week 4:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[3]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[3].duration}}
+              </span>
+
+              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[4])}">Friday:</span>
+              <span [ngClass]="checkShowAlert(user.daysLogged[4]) === true ? 'alert-text' : 'std-text'">
+                {{user.daysLogged[4].duration}}
+              </span>
+
+              <span>Saturday:</span>
+              <span class="std-text">{{user.daysLogged[5].duration}}</span>
+
+              <span>Sunday:</span>
+              <span class="std-text">{{user.daysLogged[6].duration}}</span>
+            </div>
+          </ng-container> -->
+        </div>
+      </div>
+
+      <!-- <button type="button" class="btn bg-btn ms-auto fw-500 h-40" (click)="showDetails = !showDetails">
+        More Details
+      </button> -->
+    </div>
+  </ng-container>
 
   <app-is-loading [isLoading]="isLoading"></app-is-loading>
 

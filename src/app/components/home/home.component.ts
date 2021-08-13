@@ -1,11 +1,11 @@
 import { Component, Inject, LOCALE_ID, OnDestroy, OnInit } from '@angular/core';
 import { TogglService } from 'src/app/services/toggl.service';
-import { compareDate, convertDateToDayAndMonthString, convertDateToDayOfWeekString, convertMillisToTimeString, convertTimeStringToNumber } from 'src/app/shared/helpers/custom-functions';
+import { compareDate, convertDateToDayAndMonthString, convertDateToDayOfWeekString, convertMillisToTimeString, convertTimeStringToNumber, convertTimeStringToTimePeriod } from 'src/app/shared/helpers/custom-functions';
 import { ReportWeekly } from 'src/app/shared/models/report-weekly.model';
 import { formatDate } from '@angular/common';
 import { ReportMonthly } from 'src/app/shared/models/report-monthly.model';
 
-import { User } from 'src/app/shared/models/user.model';
+import { DaysLogged, User } from 'src/app/shared/models/user.model';
 import { Subscription } from 'rxjs';
 import { Workspace } from 'src/app/shared/models/workspace-model';
 import { ChartSettings } from 'src/app/shared/settings/ChartSettings';
@@ -20,12 +20,15 @@ export class HomeComponent implements OnInit, OnDestroy {
   isLoading: boolean = false;
   warningMessage: string = '';
   errorMessage: string = '';
+  showDetails: boolean = false;
+  period: string = '';
 
   reportWeekly: ReportWeekly;
   reportMonthly: ReportMonthly;
   totalCountArray: number[] = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
 
   users: User[] = [];
+  usersNotLogged6hours: User[] = [];
   workspaceSub: Subscription;
   selectedWorkspace: Workspace;
 
@@ -112,6 +115,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const until = formatDate(lastDayOfWeek, 'yyyy-MM-dd', this.locale); // format firstDayOfWeekDate to yyyy-MM-dd
 
     const groupBy: string = 'users';
+    this.period = 'This Week';
 
     this.getWeeklyReport(groupBy, since, until);
 
@@ -129,6 +133,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     const until = formatDate(lastWeekEnd, 'yyyy-MM-dd', this.locale); // format firstDayOfWeekDate to yyyy-MM-dd
 
     const groupBy: string = 'users';
+    this.period = 'Last Week';
 
     this.getWeeklyReport(groupBy, since, until);
 
@@ -138,6 +143,13 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     this.resetMessages();
+    this.showDetails = false;
+
+    this.users = [];
+    this.usersNotLogged6hours = [];
+
+    this.chartSettings.chartData = [];
+    this.chartSettings.chartLabels = [];
 
     // added timeout because the api will start limiting requests if too much requests are sent at the same time
     // the safe window is 1 request per second
@@ -149,9 +161,6 @@ export class HomeComponent implements OnInit, OnDestroy {
           this.reportWeekly.groupBy = groupBy;
           this.reportWeekly.since = since;
           this.reportWeekly.until = until;
-
-          this.chartSettings.chartData = [];
-          this.chartSettings.chartLabels = [];
 
           if (this.reportWeekly.data.length === 0) {
 
@@ -166,8 +175,6 @@ export class HomeComponent implements OnInit, OnDestroy {
             daysOfWeek.forEach(day => {
               this.chartSettings.chartLabels.push([convertDateToDayOfWeekString(day), convertDateToDayAndMonthString(day)]);
             });
-
-            this.users = [];
 
             this.reportWeekly.data.forEach(data => {
 
@@ -186,9 +193,23 @@ export class HomeComponent implements OnInit, OnDestroy {
               });
 
               // add user to display on screen
-              this.users.push({ user: data.title.user as string, totalHours: convertMillisToTimeString(data.totals[7]), daysLogged: [] });
+              this.users.push({
+                user: data.title.user as string,
+                totalHours: convertMillisToTimeString(data.totals[7]),
+                daysLogged: [
+                  { date: daysOfWeek[0], duration: convertMillisToTimeString(data.totals[0]) },
+                  { date: daysOfWeek[1], duration: convertMillisToTimeString(data.totals[1]) },
+                  { date: daysOfWeek[2], duration: convertMillisToTimeString(data.totals[2]) },
+                  { date: daysOfWeek[3], duration: convertMillisToTimeString(data.totals[3]) },
+                  { date: daysOfWeek[4], duration: convertMillisToTimeString(data.totals[4]) },
+                  { date: daysOfWeek[5], duration: convertMillisToTimeString(data.totals[5]) },
+                  { date: daysOfWeek[6], duration: convertMillisToTimeString(data.totals[6]) }
+                ]
+              });
 
             });
+
+            this.setUsersNotLogged6hours();
 
             this.isLoading = false;
 
@@ -201,6 +222,62 @@ export class HomeComponent implements OnInit, OnDestroy {
         }
       );
     }, 1500);
+
+  }
+
+  setUsersNotLogged6hours(): void {
+
+    this.users.forEach(user => {
+
+      let daysLogged: DaysLogged[] = []
+      user.daysLogged.forEach(dayLogged => {
+
+        const timePeriod = convertTimeStringToTimePeriod(dayLogged.duration);
+
+        if (compareDate(dayLogged.date, new Date) === -1) {
+          if ((parseInt(timePeriod.hours, 10) < 6) && (dayLogged.date.getDay() > 0 && dayLogged.date.getDay() < 6))
+            daysLogged.push({ date: dayLogged.date, duration: dayLogged.duration });
+        }
+
+      });
+
+      if (daysLogged.length > 0) {
+
+        this.usersNotLogged6hours.push({
+          user: user.user,
+          totalHours: user.totalHours,
+          daysLogged: daysLogged
+        });
+
+      }
+
+    });
+
+  }
+
+  amountOfDaysNotLoggedFor6Hours(user: string): number {
+
+    let amount: number = 0;
+
+    this.usersNotLogged6hours.forEach(users => {
+      if (users.user === user)
+        amount = users.daysLogged.length;
+    });
+
+    return amount;
+
+  }
+
+  checkShowAlert(dayLogged: DaysLogged): boolean {
+
+    if (this.period === 'This Week') {
+      const timePeriod = convertTimeStringToTimePeriod(dayLogged.duration);
+
+      if (compareDate(dayLogged.date, new Date) === -1 && parseInt(timePeriod.hours, 10) < 6)
+        return true;
+    }
+
+    return false;
 
   }
 
@@ -243,6 +320,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     this.isLoading = true;
     this.resetMessages();
+    this.showDetails = false;
+    this.period = 'Month';
+
+    this.users = [];
+    this.usersNotLogged6hours = [];
+
+    this.chartSettings.chartData = [];
+    this.chartSettings.chartLabels = []
 
     // added timeout because the api will start limiting requests if too much requests are sent at the same time
     // the safe window is 1 request per second
@@ -256,9 +341,6 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.reportMonthly.groupBy = groupBy;
             this.reportMonthly.since = since;
             this.reportMonthly.until = until;
-
-            this.chartSettings.chartData = [];
-            this.chartSettings.chartLabels = [];
 
           } else this.reportMonthly.data = this.reportMonthly.data.concat(result.data); // add report data list to current list
 
@@ -341,8 +423,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
               });
 
-              this.users = [];
-
               // add user to display on screen
               users.forEach(user => {
 
@@ -378,4 +458,3 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
 }
-
