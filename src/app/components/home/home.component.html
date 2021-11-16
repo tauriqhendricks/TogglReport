@@ -1,10 +1,9 @@
 <div class="mt-4 mb-4">
-
   <form (ngSubmit)="submitThisWeek()" novalidate>
-
     <div *ngIf="warningMessage && warningMessage.length > 0" class="alert alert-custom" role="alert">
       {{warningMessage}}
     </div>
+
     <div *ngIf="errorMessage && errorMessage.length > 0" class="alert alert-danger" role="alert">
       {{errorMessage}}
     </div>
@@ -58,6 +57,7 @@
             </span>
           </ng-container>
         </div>
+
         <div class="card-body">
           <p class="card-title grid-2">
             <span class="me-1 fw-500">Total Hours:</span>
@@ -112,55 +112,16 @@
         <div class="card-header fw-500 d-flex justify-content-between" [ngClass]="'bg' + (i+1)">
           {{user.user}}
         </div>
+
         <div class="card-body">
           <p class="card-title grid-2">
             <span class="me-1 fw-500">Total Hours:</span>
             <span class="fw-500 std-text">{{user.totalHours}}</span>
           </p>
-
-          <!-- <ng-container *ngIf="showDetails">
-            <div class="card-text grid-2">
-              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[0])}">Week 1:</span>
-              <span [ngClass]="checkShowAlert(user.daysLogged[0]) === true ? 'alert-text' : 'std-text'">
-                {{user.daysLogged[0].duration}}
-              </span>
-
-              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[1])}">Week 2:</span>
-              <span [ngClass]="checkShowAlert(user.daysLogged[1]) === true ? 'alert-text' : 'std-text'">
-                {{user.daysLogged[1].duration}}
-              </span>
-
-              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[2])}">Week 3:</span>
-              <span [ngClass]="checkShowAlert(user.daysLogged[2]) === true ? 'alert-text' : 'std-text'">
-                {{user.daysLogged[2].duration}}
-              </span>
-
-              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[3])}">Week 4:</span>
-              <span [ngClass]="checkShowAlert(user.daysLogged[3]) === true ? 'alert-text' : 'std-text'">
-                {{user.daysLogged[3].duration}}
-              </span>
-
-              <span [ngClass]="{'alert-text': checkShowAlert(user.daysLogged[4])}">Friday:</span>
-              <span [ngClass]="checkShowAlert(user.daysLogged[4]) === true ? 'alert-text' : 'std-text'">
-                {{user.daysLogged[4].duration}}
-              </span>
-
-              <span>Saturday:</span>
-              <span class="std-text">{{user.daysLogged[5].duration}}</span>
-
-              <span>Sunday:</span>
-              <span class="std-text">{{user.daysLogged[6].duration}}</span>
-            </div>
-          </ng-container> -->
         </div>
       </div>
-
-      <!-- <button type="button" class="btn bg-btn ms-auto fw-500 h-40" (click)="showDetails = !showDetails">
-        More Details
-      </button> -->
     </div>
   </ng-container>
 
   <app-is-loading [isLoading]="isLoading"></app-is-loading>
-
 </div>

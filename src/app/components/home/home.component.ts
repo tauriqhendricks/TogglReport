@@ -9,6 +9,7 @@ import { DaysLogged, User } from 'src/app/shared/models/user.model';
 import { Subscription } from 'rxjs';
 import { Workspace } from 'src/app/shared/models/workspace-model';
 import { ChartSettings } from 'src/app/shared/settings/ChartSettings';
+import { ApiInfo } from 'src/app/shared/models/api-info.model';
 
 @Component({
   selector: 'app-home',
@@ -17,18 +18,31 @@ import { ChartSettings } from 'src/app/shared/settings/ChartSettings';
 })
 export class HomeComponent implements OnInit, OnDestroy {
 
+  // there are only 5 users on each workspace
+
   isLoading: boolean = false;
+
+  // messages
   warningMessage: string = '';
   errorMessage: string = '';
+
   showDetails: boolean = false;
+
+  // used to display the differnt time details on the html
   period: string = '';
 
   reportWeekly: ReportWeekly;
   reportMonthly: ReportMonthly;
+
+  // used to get all the data from the month report api, the api only returns data in a list with 50 objects, with this the maximum data that can be retreived is 1000
   totalCountArray: number[] = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
 
   users: User[] = [];
+
+  // users should at least log time for 6 hours a day
+  // if a user did not for the current week, that specific day will be flagged
   usersNotLogged6hours: User[] = [];
+
   workspaceSub: Subscription;
   selectedWorkspace: Workspace;
 
@@ -48,6 +62,14 @@ export class HomeComponent implements OnInit, OnDestroy {
       (result: Workspace) => this.selectedWorkspace = result
     );
 
+    this.chartSetUpOnInit();
+
+    this.isLoading = false;
+
+  }
+
+  chartSetUpOnInit(): void {
+
     // get first day of week, Date format
     const firstDayOfWeekDate = this.getFirstDayOfWeekDate();
 
@@ -62,16 +84,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     daysOfWeek.forEach(day => {
       this.chartSettings.chartLabelsDefault.push([convertDateToDayOfWeekString(day), convertDateToDayAndMonthString(day)]);
     });
-
-    this.isLoading = false;
-
-  }
-
-  resetBarChartDataMonth(): void {
-
-    this.chartSettings.chartData = [
-      { data: [0], label: 'Users' }
-    ];
 
   }
 
@@ -126,6 +138,7 @@ export class HomeComponent implements OnInit, OnDestroy {
     // get first day of week, Date format
     const firstDayOfWeekDate = this.getFirstDayOfWeekDate();
 
+    // get the prev week start date
     let lastWeekStart = new Date(firstDayOfWeekDate.setDate(firstDayOfWeekDate.getDate() - 7));
     let lastWeekEnd = new Date(firstDayOfWeekDate.setDate(firstDayOfWeekDate.getDate() + 6));
 
@@ -148,19 +161,30 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.users = [];
     this.usersNotLogged6hours = [];
 
-    this.chartSettings.chartData = [];
-    this.chartSettings.chartLabels = [];
+    this.resetChart();
+
+    // create the object that will be sent to the api
+    const apiInfo: ApiInfo = {
+      key: this.selectedWorkspace.apiKey,
+      workspaceId: this.selectedWorkspace.workspaceId,
+      groupBy,
+      since,
+      until
+    }
 
     // added timeout because the api will start limiting requests if too much requests are sent at the same time
     // the safe window is 1 request per second
     setTimeout(() => {
-      this.togglService.getWeeklyReport(this.selectedWorkspace.apiKey, this.selectedWorkspace.workspaceId, groupBy, since, until).subscribe(
+      this.togglService.getWeeklyReport(apiInfo).subscribe(
         (result: ReportWeekly) => {
 
           this.reportWeekly = result;
           this.reportWeekly.groupBy = groupBy;
           this.reportWeekly.since = since;
           this.reportWeekly.until = until;
+
+          console.log('this.reportWeekly', this.reportWeekly);
+
 
           if (this.reportWeekly.data.length === 0) {
 
@@ -225,6 +249,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   }
 
+  /**
+   * Check if users logged at least 6 hours of work.
+   */
   setUsersNotLogged6hours(): void {
 
     this.users.forEach(user => {
@@ -268,6 +295,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   }
 
+  /**
+   * If true css will be an alert class.
+   */
   checkShowAlert(dayLogged: DaysLogged): boolean {
 
     if (this.period === 'This Week') {
@@ -302,6 +332,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const curr = new Date(); // get current date
 
+    // get the prev month date
     const lastMonth = new Date(curr.getFullYear(), curr.getMonth() - 1, curr.getDate());
     const firstDayOfMonth = new Date(lastMonth.getFullYear(), lastMonth.getMonth(), 1);
     const lastDayOfMonth = new Date(lastMonth.getFullYear(), lastMonth.getMonth() + 1, 0);
@@ -326,15 +357,27 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.users = [];
     this.usersNotLogged6hours = [];
 
-    this.chartSettings.chartData = [];
-    this.chartSettings.chartLabels = []
+    this.resetChart();
+
+    // create the object that will be sent to the api
+    const apiInfo: ApiInfo = {
+      key: this.selectedWorkspace.apiKey,
+      workspaceId: this.selectedWorkspace.workspaceId,
+      groupBy,
+      since,
+      until,
+      page
+    }
 
     // added timeout because the api will start limiting requests if too much requests are sent at the same time
     // the safe window is 1 request per second
     setTimeout(() => {
-      this.togglService.getMonthlyReport(this.selectedWorkspace.apiKey, this.selectedWorkspace.workspaceId, groupBy, since, until, page).subscribe(
+      this.togglService.getMonthlyReport(apiInfo).subscribe(
         (result: ReportMonthly) => {
 
+          console.log('this.ReportMonthly', result);
+
+          // check if the request is a new one, if not add result to current month data list
           if (newRequest === false) {
 
             this.reportMonthly = result;
@@ -342,7 +385,8 @@ export class HomeComponent implements OnInit, OnDestroy {
             this.reportMonthly.since = since;
             this.reportMonthly.until = until;
 
-          } else this.reportMonthly.data = this.reportMonthly.data.concat(result.data); // add report data list to current list
+          } else
+            this.reportMonthly.data = this.reportMonthly.data.concat(result.data); // add report data list to current list
 
           if (this.reportMonthly.data.length === 0) {
 
@@ -413,7 +457,7 @@ export class HomeComponent implements OnInit, OnDestroy {
                   duration.push(convertTimeStringToNumber(convertMillisToTimeString(days.duration)));
                 });
 
-                // map chart data to user
+                // map user data to chart
                 this.chartSettings.chartData.push({
                   data:
                     duration
@@ -450,6 +494,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       );
     }, 1500);
+
+  }
+
+  resetChart(): void {
+
+    // resetting the chart
+    this.chartSettings.chartData = [];
+    this.chartSettings.chartLabels = [];
 
   }
 

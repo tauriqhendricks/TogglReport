@@ -1,20 +1,20 @@
 <nav class="navbar navbar-expand-lg navbar-light border-custom">
   <div class="container">
-    <a class="navbar-brand fs-4" [routerLink]="['/']" style="color: #000; font-weight: 700;">TogglReport</a>
+    <a class="navbar-brand fs-4" [routerLink]="['/']">TogglReport</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
       aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNav" style="justify-content: flex-end;">
+    <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
       <ul class="navbar-nav">
         <li class="nav-item dropdown">
-          <button class="btn dropdown-toggle" id="navbarDarkDropdownMenuLink" type="button" data-bs-toggle="dropdown"
-            aria-expanded="false" style="background: #ED6A5A; font-weight: 500;">
+          <button class="btn dropdown-toggle btn-dropdown" id="navbarDarkDropdownMenuLink" type="button"
+            data-bs-toggle="dropdown" aria-expanded="false">
             {{selectedWorkspace.name}}
           </button>
           <ul class="dropdown-menu" aria-labelledby="navbarDarkDropdownMenuLink">
             <li *ngFor="let workspace of workspaces">
-              <button class="dropdown-item" style="font-weight: 500;" (click)="onSelectedWorkspace(workspace)">{{workspace.name}}</button>
+              <button class="dropdown-item fw-500" (click)="onSelectedWorkspace(workspace)">{{workspace.name}}</button>
             </li>
           </ul>
         </li>

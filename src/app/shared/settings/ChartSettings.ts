@@ -2,6 +2,9 @@ import { ChartData, ChartDataSets, ChartOptions, ChartTooltipItem, ChartType } f
 import { Color, Label } from "ng2-charts";
 import { convertNumberToTimeString } from "../helpers/custom-functions";
 
+/**
+ * The Chart Settings
+ */
 export class ChartSettings {
 
   chartOptions: ChartOptions = {
@@ -10,6 +13,7 @@ export class ChartSettings {
       xPadding: 10,
       yPadding: 10,
       callbacks: {
+        // when hoverirng over a column, the user's name will display
         title: function (context: ChartTooltipItem[], data: ChartData): string {
 
           const index = context[0].datasetIndex as number;
@@ -19,6 +23,7 @@ export class ChartSettings {
           return title;
 
         },
+        // when hoverirng over a column, the time logged for that timeperiod will be diplayed under the user's name
         label: function (context: ChartTooltipItem): string {
 
           const value = context.yLabel as number;
@@ -31,6 +36,7 @@ export class ChartSettings {
     },
     scales: {
       yAxes: [{
+        // set the label of the graph
         scaleLabel: {
           display: true,
           labelString: 'Hours'
@@ -42,6 +48,7 @@ export class ChartSettings {
         }
       }],
       xAxes: [{
+        // set the label of the graph
         scaleLabel: {
           display: true,
           labelString: 'Day'
