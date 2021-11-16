@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
+import { Observable } from 'rxjs';
 import { TogglService } from 'src/app/services/toggl.service';
+import { WorkspaceService } from 'src/app/services/workspace.service';
 import { Workspace } from 'src/app/shared/models/workspace-model';
 
 @Component({
@@ -9,23 +11,47 @@ import { Workspace } from 'src/app/shared/models/workspace-model';
 })
 export class NavComponent implements OnInit {
 
+  isLoading$: Observable<boolean>;
+  errorMessage: string = '';
+
   selectedWorkspace: Workspace;
   workspaces: Workspace[] = [];
 
-  constructor(private togglService: TogglService) { }
+  constructor(
+    private togglService: TogglService,
+    private workspaceService: WorkspaceService) { }
 
   ngOnInit(): void {
 
-    // add workspaces
-    this.workspaces.push({ workspaceId: '4519795', apiKey: '3fea34b99c7950e8e52909a69a63fce2', name: `Nieljacobssa's workspace` });
-    this.workspaces.push({ workspaceId: '352049', apiKey: '95f2486932f02a9a776bbb9362691cfb', name: 'Bitcube' });
-    this.workspaces.push({ workspaceId: '12345', apiKey: 'random23123123213weq', name: 'Testing Workspace' });
-    this.sortWorkspaces();
+    this.getWorkspaces();
 
-    this.selectedWorkspace = this.workspaces[0];
-    this.workspaces = this.workspaces.filter(x => x !== this.selectedWorkspace)
+  }
 
-    this.togglService.changeWorkspace(this.selectedWorkspace)
+  getWorkspaces(): void {
+
+    this.isLoading$ = this.togglService.isNavLoadingChange$;
+    this.togglService.changeIsNavLoading(true)
+
+    this.errorMessage = '';
+
+    this.workspaceService.getWorkspaces()
+      .subscribe((result: Workspace[]) => {
+
+        this.workspaces = result;
+        this.sortWorkspaces();
+
+        this.selectedWorkspace = this.workspaces[0];
+        this.workspaces = this.workspaces.filter(x => x !== this.selectedWorkspace)
+
+        this.togglService.changeWorkspace(this.selectedWorkspace)
+        this.togglService.changeIsNavLoading(false)
+
+      }, err => {
+
+        this.errorMessage = 'Could not retrieve any Workspaces!!!';
+        this.togglService.changeIsNavLoading(false)
+
+      });
 
   }
 

@@ -34,7 +34,7 @@ export class BaseService {
     }
 
     return throwError(err);
-    
+
   }
 
 }

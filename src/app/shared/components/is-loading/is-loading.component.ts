@@ -7,7 +7,7 @@ import { Component, Input, OnInit } from '@angular/core';
 })
 export class IsLoadingComponent implements OnInit {
 
-  @Input() isLoading: boolean;
+  @Input() isLoading: boolean | null;
 
   constructor() { }
 

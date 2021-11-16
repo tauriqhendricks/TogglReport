@@ -6,7 +6,7 @@ import { formatDate } from '@angular/common';
 import { ReportMonthly } from 'src/app/shared/models/report-monthly.model';
 
 import { DaysLogged, User } from 'src/app/shared/models/user.model';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { Workspace } from 'src/app/shared/models/workspace-model';
 import { ChartSettings } from 'src/app/shared/settings/ChartSettings';
 import { ApiInfo } from 'src/app/shared/models/api-info.model';
@@ -20,6 +20,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   // there are only 5 users on each workspace
 
+  isNavLoading$: Observable<boolean>;
   isLoading: boolean = false;
 
   // messages
@@ -34,7 +35,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   reportWeekly: ReportWeekly;
   reportMonthly: ReportMonthly;
 
-  // used to get all the data from the month report api, the api only returns data in a list with 50 objects, with this the maximum data that can be retreived is 1000
+  // used to get all the data from the month report api, the api only returns data in a list with 50 objects, with this the maximum data that can be retrieved is 1000
   totalCountArray: number[] = [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
 
   users: User[] = [];
@@ -55,6 +56,7 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
 
+    this.isNavLoading$ = this.togglService.isNavLoadingChange$;
     this.isLoading = true;
 
     // get selected workspace
@@ -117,6 +119,9 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   submitThisWeek(): void {
 
+    console.log('this.selectedWorkspace', this.selectedWorkspace);
+
+
     // get first day of week, Date format
     const firstDayOfWeekDate = this.getFirstDayOfWeekDate();
 
@@ -134,6 +139,9 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   submitLastWeek(): void {
+
+    console.log('this.selectedWorkspace', this.selectedWorkspace);
+
 
     // get first day of week, Date format
     const firstDayOfWeekDate = this.getFirstDayOfWeekDate();
@@ -241,8 +249,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         },
         err => {
+
           this.errorMessage = 'Workspace does not exist!!!';
           this.isLoading = false;
+
         }
       );
     }, 1500);
@@ -312,6 +322,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   submitThisMonth(): void {
+    console.log('this.selectedWorkspace', this.selectedWorkspace);
 
     const curr = new Date(); // get current date
 
@@ -329,6 +340,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   submitLastMonth(): void {
+    console.log('this.selectedWorkspace', this.selectedWorkspace);
 
     const curr = new Date(); // get current date
 
@@ -488,8 +500,10 @@ export class HomeComponent implements OnInit, OnDestroy {
 
         },
         err => {
+
           this.errorMessage = 'Workspace does not exist!!!';
           this.isLoading = false;
+
         }
 
       );

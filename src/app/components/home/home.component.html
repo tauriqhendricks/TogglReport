@@ -1,4 +1,4 @@
-<div class="mt-4 mb-4">
+<div *ngIf="!(isNavLoading$ | async)" class="mt-4 mb-4">
   <form (ngSubmit)="submitThisWeek()" novalidate>
     <div *ngIf="warningMessage && warningMessage.length > 0" class="alert alert-custom" role="alert">
       {{warningMessage}}
@@ -125,3 +125,5 @@
 
   <app-is-loading [isLoading]="isLoading"></app-is-loading>
 </div>
+
+<app-is-loading [isLoading]="isNavLoading$ | async"></app-is-loading>
