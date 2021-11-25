@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { ReportTestData } from '../shared/data/weekly-report-test-data';
+import { ReportMonthly } from '../shared/models/report-monthly.model';
+import { ReportWeekly } from '../shared/models/report-weekly.model';
 import { Workspace } from '../shared/models/workspace-model';
 import { BaseService } from './_base.service';
 
@@ -19,6 +22,20 @@ export class WorkspaceService extends BaseService {
   getWorkspaces(): Observable<Workspace[]> {
 
     return this.workspacesSource.asObservable();
+
+  }
+
+  getTestWeekReportData(since: string, until: string, amountOfDays: number): ReportWeekly {
+
+    const weeklyReportTestData = new ReportTestData(since, until, amountOfDays);
+    return weeklyReportTestData.getWeekTestData();
+
+  }
+
+  getTestMonthReportData(since: string, until: string): ReportMonthly {
+
+    const monthlyReportTestData = new ReportTestData(since, until);
+    return monthlyReportTestData.getMonthTestData();
 
   }
 

@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { TogglService } from 'src/app/services/toggl.service';
 import { WorkspaceService } from 'src/app/services/workspace.service';
 import { Workspace } from 'src/app/shared/models/workspace-model';
@@ -9,9 +9,11 @@ import { Workspace } from 'src/app/shared/models/workspace-model';
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss']
 })
-export class NavComponent implements OnInit {
+export class NavComponent implements OnInit, OnDestroy {
 
   isLoading$: Observable<boolean>;
+  sub: Subscription;
+
   errorMessage: string = '';
 
   selectedWorkspace: Workspace;
@@ -34,7 +36,7 @@ export class NavComponent implements OnInit {
 
     this.errorMessage = '';
 
-    this.workspaceService.getWorkspaces()
+    this.sub = this.workspaceService.getWorkspaces()
       .subscribe((result: Workspace[]) => {
 
         this.workspaces = result;
@@ -75,6 +77,13 @@ export class NavComponent implements OnInit {
     this.selectedWorkspace = workspace;
 
     this.togglService.changeWorkspace(this.selectedWorkspace)
+
+  }
+
+  ngOnDestroy(): void {
+
+    if (this.sub)
+      this.sub.unsubscribe();
 
   }
 

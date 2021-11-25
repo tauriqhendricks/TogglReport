@@ -15,7 +15,7 @@ export class ReportMonthly {
 
 }
 
-class ReportDataMonthly {
+export class ReportDataMonthly {
 
   pid?: string;
   uid?: string;

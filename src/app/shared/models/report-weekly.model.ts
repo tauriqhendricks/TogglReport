@@ -14,8 +14,8 @@ export class ReportWeekly {
 
 }
 
-class ReportDataWeekly{
-  
+export class ReportDataWeekly {
+
   pid?: string;
   uid?: string;
 
@@ -23,10 +23,10 @@ class ReportDataWeekly{
   totals: string[] = [];
 
   details: DataDetailsWeekly[] = []
-  
+
 }
 
-class DataTitleWeekly{
+class DataTitleWeekly {
 
   user?: string;
   client?: string;
@@ -34,7 +34,7 @@ class DataTitleWeekly{
 
 }
 
-class DataDetailsWeekly{
+class DataDetailsWeekly {
 
   pid?: string;
   uid?: string;
