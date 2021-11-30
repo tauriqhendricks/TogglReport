@@ -27,15 +27,15 @@ export class WorkspaceService extends BaseService {
 
   getTestWeekReportData(since: string, until: string, amountOfDays: number): ReportWeekly {
 
-    const weeklyReportTestData = new ReportTestData(since, until, amountOfDays);
-    return weeklyReportTestData.getWeekTestData();
+    const weeklyReportTestData = new ReportTestData(since, until);
+    return weeklyReportTestData.getWeekTestData(amountOfDays);
 
   }
 
-  getTestMonthReportData(since: string, until: string): ReportMonthly {
+  getTestMonthReportData(since: string, until: string, period: string): ReportMonthly {
 
     const monthlyReportTestData = new ReportTestData(since, until);
-    return monthlyReportTestData.getMonthTestData();
+    return monthlyReportTestData.getMonthTestData(period);
 
   }
 

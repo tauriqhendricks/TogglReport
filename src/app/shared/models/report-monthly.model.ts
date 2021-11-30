@@ -17,8 +17,8 @@ export class ReportMonthly {
 
 export class ReportDataMonthly {
 
-  pid?: string;
-  uid?: string;
+  pid?: string | number;
+  uid?: string | number;
 
   start: string;
   startDate: Date;
@@ -26,9 +26,24 @@ export class ReportDataMonthly {
   end: string;
   endDate: Date;
 
-  dur: string;
+  dur: number;
   user: string;
   client: string;
   project: string;
+
+
+  // added for test data and can be used in future
+  billable: string;
+  cur: string;
+  description: string;
+  id: number;
+  is_billable: boolean;
+  project_color: string;
+  project_hex_color: string;
+  tags: string[];
+  task: string;
+  tid: string;
+  updated: string;
+  use_stop: boolean;
 
 }

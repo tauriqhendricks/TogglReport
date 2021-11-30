@@ -381,8 +381,6 @@ export class HomeComponent implements OnInit, OnDestroy {
 
   submitThisMonth(): void {
 
-    console.log('this.selectedWorkspace', this.selectedWorkspace);
-
     const curr = new Date(); // get current date
 
     const firstDayOfMonth = new Date(curr.getFullYear(), curr.getMonth(), 1);
@@ -396,12 +394,14 @@ export class HomeComponent implements OnInit, OnDestroy {
 
     const apiInfo = this.createApiInfo(since, until, groupBy, page);
 
-    this.getMonthlyReport(apiInfo);
+    if (this.selectedWorkspace.name === 'Testing Workspace')
+      this.getTestMonthlyReport(apiInfo, 'this');
+    else
+      this.getMonthlyReport(apiInfo);
 
   }
 
   submitLastMonth(): void {
-    console.log('this.selectedWorkspace', this.selectedWorkspace);
 
     const curr = new Date(); // get current date
 
@@ -419,118 +419,9 @@ export class HomeComponent implements OnInit, OnDestroy {
     const apiInfo = this.createApiInfo(since, until, groupBy, page);
 
     if (this.selectedWorkspace.name === 'Testing Workspace')
-      this.getTestMonthlyReport(apiInfo);
+      this.getTestMonthlyReport(apiInfo, 'last');
     else
       this.getMonthlyReport(apiInfo);
-
-  }
-
-  getTestMonthlyReport(apiInfo: ApiInfo): void {
-
-    this.isLoading = true;
-    this.resetMessages();
-    this.showDetails = false;
-    this.period = 'Month';
-
-    this.users = [];
-    this.usersNotLogged6hours = [];
-
-    this.resetChart();
-
-    setTimeout(() => {
-
-      this.reportMonthly = this.workspaceService.getTestMonthReportData(apiInfo.since, apiInfo.until);
-
-      console.log('reportMonthly', this.reportMonthly);
-
-      this.reportMonthly.groupBy = apiInfo.groupBy;
-      this.reportMonthly.since = apiInfo.since;
-      this.reportMonthly.until = apiInfo.until;
-
-      this.reportMonthly.data.reverse();
-      this.setReportMonthlyData();
-
-      this.isLoading = false;
-
-    }, 1500);
-
-  }
-
-  setReportMonthlyData(): void {
-
-    // get all days of the month to display on the chart
-    const daysOfMonth = this.getAllDaysBetweenTwoDates(this.reportMonthly.since, this.reportMonthly.until);
-    daysOfMonth.forEach(day => {
-      this.chartSettings.chartLabels.push([convertDateToDayOfWeekString(day), convertDateToDayAndMonthString(day)]);
-    });
-
-    let users: User[] = []
-
-    this.reportMonthly.data.forEach(data => {
-      if (!users.some(x => x.user === data.user))
-        users.push({ user: data.user, totalHours: '0', daysLogged: [{ date: new Date(), duration: '0' }] });
-    });
-
-    users.forEach(user => {
-
-      user.daysLogged = [];
-
-      // add all the days of the month to each user
-      daysOfMonth.forEach(day => {
-        user.daysLogged.push({ date: day, duration: '0' });
-      });
-
-      user.daysLogged.forEach(days => {
-        this.reportMonthly.data.forEach(data => {
-
-          data.startDate = new Date(data.start);
-          data.endDate = new Date(data.end);
-
-          if (user.user === data.user) {
-            // check if the user logged time for that day
-            if (compareDate(days.date, data.startDate) === 0) {
-
-              let duration = parseInt(days.duration, 10);
-              duration = duration + parseInt(data.dur, 10);
-
-              // set the time the user logged for the day
-              days.duration = duration.toString();
-
-            }
-          }
-
-        });
-      });
-
-      let duration: number[] = [];
-
-      // map the duration to a number list, in order to map the data to the chart easier
-      user.daysLogged.forEach(days => {
-        duration.push(convertTimeStringToNumber(convertMillisToTimeString(days.duration)));
-      });
-
-      // map user data to chart
-      this.chartSettings.chartData.push({
-        data:
-          duration
-        ,
-        label: user.user
-      });
-
-    });
-
-    // add user to display on screen
-    users.forEach(user => {
-
-      let total = 0
-      user.daysLogged.forEach(days => {
-        total += parseInt(days.duration, 10);
-      });
-
-      user.totalHours = convertMillisToTimeString(total.toString());
-      this.users.push(user);
-
-    });
 
   }
 
@@ -551,8 +442,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     setTimeout(() => {
       this.togglService.getMonthlyReport(apiInfo).subscribe(
         (result: ReportMonthly) => {
-
-          console.log('this.ReportMonthly', result);
 
           // check if the request is a new one, if not add result to current month data list
           if (newRequest === false) {
@@ -600,6 +489,114 @@ export class HomeComponent implements OnInit, OnDestroy {
 
       );
     }, 1500);
+
+  }
+
+  getTestMonthlyReport(apiInfo: ApiInfo, period: string): void {
+
+    this.isLoading = true;
+    this.resetMessages();
+    this.showDetails = false;
+    this.period = 'Month';
+
+    this.users = [];
+    this.usersNotLogged6hours = [];
+
+    this.resetChart();
+
+    setTimeout(() => {
+
+      this.reportMonthly = this.workspaceService.getTestMonthReportData(apiInfo.since, apiInfo.until, period);
+
+      this.reportMonthly.groupBy = apiInfo.groupBy;
+      this.reportMonthly.data = this.reportMonthly.data.filter(data => compareDate(data.endDate, new Date()) === -1);
+
+      this.reportMonthly.data.reverse();
+      this.setReportMonthlyData(true);
+
+      this.isLoading = false;
+
+    }, 1500);
+
+  }
+
+  setReportMonthlyData(fromTest: boolean = false): void {
+
+    // get all days of the month to display on the chart
+    const daysOfMonth = this.getAllDaysBetweenTwoDates(this.reportMonthly.since, this.reportMonthly.until);
+    daysOfMonth.forEach(day => {
+      this.chartSettings.chartLabels.push([convertDateToDayOfWeekString(day), convertDateToDayAndMonthString(day)]);
+    });
+
+    let users: User[] = []
+
+    this.reportMonthly.data.forEach(data => {
+      if (!users.some(x => x.user === data.user))
+        users.push({ user: data.user, totalHours: '0', daysLogged: [{ date: new Date(), duration: '0' }] });
+    });
+
+    users.forEach(user => {
+
+      user.daysLogged = [];
+
+      // add all the days of the month to each user
+      daysOfMonth.forEach(day => {
+        user.daysLogged.push({ date: day, duration: '0' });
+      });
+
+      user.daysLogged.forEach(days => {
+        this.reportMonthly.data.forEach(data => {
+
+          if (!fromTest) {
+            data.startDate = new Date(data.start);
+            data.endDate = new Date(data.end);
+          }
+
+          if (user.user === data.user) {
+            // check if the user logged time for that day
+            if (compareDate(days.date, data.startDate) === 0) {
+
+              let duration = parseInt(days.duration, 10);
+              duration = duration + data.dur;//parseInt(data.dur as string, 10);
+
+              // set the time the user logged for the day
+              days.duration = duration.toString();
+
+            }
+          }
+
+        });
+      });
+
+      let duration: number[] = [];
+
+      // map the duration to a number list, in order to map the data to the chart easier
+      user.daysLogged.forEach(days => {
+        duration.push(convertTimeStringToNumber(convertMillisToTimeString(days.duration)));
+      });
+
+      // map user data to chart
+      this.chartSettings.chartData.push({
+        data:
+          duration
+        ,
+        label: user.user
+      });
+
+    });
+
+    // add user to display on screen
+    users.forEach(user => {
+
+      let total = 0
+      user.daysLogged.forEach(days => {
+        total += parseInt(days.duration, 10);
+      });
+
+      user.totalHours = convertMillisToTimeString(total.toString());
+      this.users.push(user);
+
+    });
 
   }
 
