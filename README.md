@@ -13,6 +13,9 @@ This project was generated with Angular CLI version 12.2.11.
     <li>
       <a href="#built-with">Built With</a>
     </li>
+    <li>
+      <a href="#future-updates">Future Updates</a>
+    </li>
   </ol>
 </details>
 
@@ -32,10 +35,13 @@ There are only 5 users per workspace as it is on the free plan.
 * select workspace
 * select which period you want to check the logged times for
 
-## Built Wit
+## Built With
 This project is built with the following tools:
 * [Angular Web Framework](https://angular.io/)
 * [Visual Studio Code](https://code.visualstudio.com/)
 * [Bootstrap](https://ng-bootstrap.github.io/#/home)
 * [chart.js](https://www.chartjs.org/)
 * [ng2-charts](https://valor-software.com/ng2-charts/)
+
+## Future Updates
+* allow usres to create a account in order for them to add their own workspaces and check the times logged by the workspace users
