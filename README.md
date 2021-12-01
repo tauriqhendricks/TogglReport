@@ -28,6 +28,10 @@ I created a project that uses Toggl's api to allow me to check if the interns lo
 The project uses the Toggl workspace's Id and apikey to retreive the logged data.
 There are only 5 users per workspace as it is on the free plan.
 
+### Steps
+* select workspace
+* select which period you want to check the logged times for
+
 ## Built With
 
 This project is built with the following tools:
