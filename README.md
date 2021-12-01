@@ -32,16 +32,10 @@ There are only 5 users per workspace as it is on the free plan.
 * select workspace
 * select which period you want to check the logged times for
 
-## Built With
-
+## Built Wit
 This project is built with the following tools:
 * [Angular Web Framework](https://angular.io/)
 * [Visual Studio Code](https://code.visualstudio.com/)
 * [Bootstrap](https://ng-bootstrap.github.io/#/home)
 * [chart.js](https://www.chartjs.org/)
 * [ng2-charts](https://valor-software.com/ng2-charts/)
-
-This project is built in the following languages:
-* HTML
-* CSS
-* TypeScript
