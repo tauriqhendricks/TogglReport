@@ -1,5 +1,8 @@
 import { Money } from "./money.model";
 
+/**
+ *  Holds all the data for the weekly report
+ */
 export class ReportWeekly {
 
   total_grand: number;
@@ -14,8 +17,8 @@ export class ReportWeekly {
 
 }
 
-class ReportDataWeekly{
-  
+export class ReportDataWeekly {
+
   pid?: string;
   uid?: string;
 
@@ -23,10 +26,10 @@ class ReportDataWeekly{
   totals: string[] = [];
 
   details: DataDetailsWeekly[] = []
-  
+
 }
 
-class DataTitleWeekly{
+class DataTitleWeekly {
 
   user?: string;
   client?: string;
@@ -34,7 +37,7 @@ class DataTitleWeekly{
 
 }
 
-class DataDetailsWeekly{
+class DataDetailsWeekly {
 
   pid?: string;
   uid?: string;

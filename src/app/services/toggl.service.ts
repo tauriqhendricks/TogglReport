@@ -63,4 +63,10 @@ export class TogglService extends BaseService {
     this.workspaceSource.next(workspace);
   }
 
+  private isNavLoadingSource = new BehaviorSubject<boolean>(false);
+  isNavLoadingChange$ = this.isNavLoadingSource.asObservable();
+  changeIsNavLoading(isNavLoading: boolean) {
+    this.isNavLoadingSource.next(isNavLoading);
+  }
+
 }

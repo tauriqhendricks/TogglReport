@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-light border-custom">
+<nav *ngIf="!(isLoading$ | async)" class="navbar navbar-expand-lg navbar-light border-custom">
   <div class="container">
     <a class="navbar-brand fs-4" [routerLink]="['/']">TogglReport</a>
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"

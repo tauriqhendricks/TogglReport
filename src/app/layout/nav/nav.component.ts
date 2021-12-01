@@ -1,5 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { TogglService } from 'src/app/services/toggl.service';
+import { WorkspaceService } from 'src/app/services/workspace.service';
 import { Workspace } from 'src/app/shared/models/workspace-model';
 
 @Component({
@@ -7,31 +9,62 @@ import { Workspace } from 'src/app/shared/models/workspace-model';
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss']
 })
-export class NavComponent implements OnInit {
+export class NavComponent implements OnInit, OnDestroy {
+
+  isLoading$: Observable<boolean>;
+  sub: Subscription;
+
+  errorMessage: string = '';
 
   selectedWorkspace: Workspace;
   workspaces: Workspace[] = [];
 
-  constructor(private togglService: TogglService) { }
+  constructor(
+    private togglService: TogglService,
+    private workspaceService: WorkspaceService) { }
 
   ngOnInit(): void {
 
-    // add workspaces
-    this.workspaces.push({ workspaceId: '4519795', apiKey: '3fea34b99c7950e8e52909a69a63fce2', name: `Nieljacobssa's workspace` });
-    this.workspaces.push({ workspaceId: '352049', apiKey: '95f2486932f02a9a776bbb9362691cfb', name: 'Bitcube' });
-    this.workspaces.push({ workspaceId: '12345', apiKey: 'random23123123213weq', name: 'Testing Workspace' });
-    this.sortWorkspaces();
+    this.getWorkspaces();
 
-    this.selectedWorkspace = this.workspaces[0];
-    this.workspaces = this.workspaces.filter(x => x !== this.selectedWorkspace)
+  }
 
-    this.togglService.changeWorkspace(this.selectedWorkspace)
+  getWorkspaces(): void {
+
+    this.isLoading$ = this.togglService.isNavLoadingChange$;
+    // set NavLoading to true
+    this.togglService.changeIsNavLoading(true)
+
+    this.errorMessage = '';
+
+    this.sub = this.workspaceService.getWorkspaces()
+      .subscribe((result: Workspace[]) => {
+
+        this.workspaces = result;
+        this.sortWorkspaces();
+
+        this.selectedWorkspace = this.workspaces[0];
+        this.workspaces = this.workspaces.filter(x => x !== this.selectedWorkspace)
+
+        this.togglService.changeWorkspace(this.selectedWorkspace)
+
+        // set NavLoading to false
+        this.togglService.changeIsNavLoading(false)
+
+      }, err => {
+
+        this.errorMessage = 'Could not retrieve any Workspaces!!!';
+
+        // set NavLoading to false
+        this.togglService.changeIsNavLoading(false)
+
+      });
 
   }
 
   sortWorkspaces(): void {
 
-    // sort alphabetical
+    // sort alphabetically
     this.workspaces.sort(function (a, b) {
       if (a.name < b.name) { return -1; }
       if (a.name > b.name) { return 1; }
@@ -49,6 +82,13 @@ export class NavComponent implements OnInit {
     this.selectedWorkspace = workspace;
 
     this.togglService.changeWorkspace(this.selectedWorkspace)
+
+  }
+
+  ngOnDestroy(): void {
+
+    if (this.sub)
+      this.sub.unsubscribe();
 
   }
 
