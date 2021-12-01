@@ -32,6 +32,7 @@ export class NavComponent implements OnInit, OnDestroy {
   getWorkspaces(): void {
 
     this.isLoading$ = this.togglService.isNavLoadingChange$;
+    // set NavLoading to true
     this.togglService.changeIsNavLoading(true)
 
     this.errorMessage = '';
@@ -46,11 +47,15 @@ export class NavComponent implements OnInit, OnDestroy {
         this.workspaces = this.workspaces.filter(x => x !== this.selectedWorkspace)
 
         this.togglService.changeWorkspace(this.selectedWorkspace)
+
+        // set NavLoading to false
         this.togglService.changeIsNavLoading(false)
 
       }, err => {
 
         this.errorMessage = 'Could not retrieve any Workspaces!!!';
+
+        // set NavLoading to false
         this.togglService.changeIsNavLoading(false)
 
       });
@@ -59,7 +64,7 @@ export class NavComponent implements OnInit, OnDestroy {
 
   sortWorkspaces(): void {
 
-    // sort alphabetical
+    // sort alphabetically
     this.workspaces.sort(function (a, b) {
       if (a.name < b.name) { return -1; }
       if (a.name > b.name) { return 1; }

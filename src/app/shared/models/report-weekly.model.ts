@@ -1,5 +1,8 @@
 import { Money } from "./money.model";
 
+/**
+ *  Holds all the data for the weekly report
+ */
 export class ReportWeekly {
 
   total_grand: number;

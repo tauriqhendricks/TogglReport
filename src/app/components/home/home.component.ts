@@ -4,7 +4,6 @@ import { compareDate, convertDateToDayAndMonthString, convertDateToDayOfWeekStri
 import { ReportWeekly } from 'src/app/shared/models/report-weekly.model';
 import { formatDate } from '@angular/common';
 import { ReportMonthly } from 'src/app/shared/models/report-monthly.model';
-
 import { DaysLogged, User } from 'src/app/shared/models/user.model';
 import { Observable, Subscription } from 'rxjs';
 import { Workspace } from 'src/app/shared/models/workspace-model';
@@ -48,7 +47,7 @@ export class HomeComponent implements OnInit, OnDestroy {
   workspaceSub: Subscription;
   selectedWorkspace: Workspace;
 
-  // created a seperate class with all the chart settings, because its alot of settings and its all in one place
+  // created a separate class with all the chart settings, because its a lot of settings and its all in one place
   chartSettings: ChartSettings = new ChartSettings();
 
   constructor(
@@ -68,7 +67,6 @@ export class HomeComponent implements OnInit, OnDestroy {
     );
 
     this.chartSetUpOnInit();
-
     this.isLoading = false;
 
   }
