@@ -43,5 +43,7 @@ This project is built with the following tools:
 * [chart.js](https://www.chartjs.org/)
 * [ng2-charts](https://valor-software.com/ng2-charts/)
 
+### Hosted with GitHub Pages
+
 ## Future Updates
 * allow usres to create a account in order for them to add their own workspaces and check the times logged by the workspace users
